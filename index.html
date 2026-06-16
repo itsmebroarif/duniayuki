@@ -164,8 +164,10 @@
 </head>
 <body>
 
+    <!-- Audio BGM -->
     <audio id="bgm" src="ost.mp3" loop></audio>
 
+    <!-- UI Menu Awal NES Style -->
     <div id="ui-layer">
         <div class="studio-logo">A GAME BY ARIF (@eexxvvn)</div>
         <h1 id="title">DUNIA<br>YUKI</h1>
@@ -177,6 +179,7 @@
         </div>
     </div>
 
+    <!-- Cutscene Layer -->
     <div id="cutscene-layer">
         <div class="cutscene-box">
             <div class="nyx-name">🌸 NYX 🌸</div>
@@ -206,6 +209,46 @@
     </div>
 
     <script>
+        // --- SISTEM AUDIO SFX ---
+        let audioCtx;
+        function initAudio() {
+            if(!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function playSFX(type) {
+            if(!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'coin') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'jump') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'click') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            }
+        }
+
+        // --- SETUP SCENE ---
         const scene = new THREE.Scene();
         
         // Langit pink susu manis
@@ -317,6 +360,22 @@
         sea.rotation.x = -Math.PI/2; sea.position.set(0, 0.2, 450); scene.add(sea);
         interactables.push({ pos: new THREE.Vector3(0, 2, 220), text: "[E] Mancing di Pantai", type: "action" });
 
+        // Area Piknik (Dekat Pantai)
+        const picnicGroup = new THREE.Group();
+        const picnicCanvas = document.createElement('canvas'); picnicCanvas.width = 128; picnicCanvas.height = 128;
+        const pCtx = picnicCanvas.getContext('2d');
+        pCtx.fillStyle = '#fff'; pCtx.fillRect(0,0,128,128); pCtx.fillStyle = '#ff69b4';
+        pCtx.fillRect(0,0,64,64); pCtx.fillRect(64,64,64,64);
+        const picnicTex = new THREE.CanvasTexture(picnicCanvas); picnicTex.wrapS = THREE.RepeatWrapping; picnicTex.wrapT = THREE.RepeatWrapping; picnicTex.repeat.set(4,4);
+        
+        const blanket = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.MeshStandardMaterial({map: picnicTex}));
+        blanket.rotation.x = -Math.PI/2; blanket.position.y = 0.15;
+        const basket = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.2, 2), new THREE.MeshStandardMaterial({color: 0xd2b48c}));
+        basket.position.set(2, 0.75, 2);
+        picnicGroup.add(blanket, basket);
+        picnicGroup.position.set(30, 0, 220);
+        scene.add(picnicGroup);
+
         // Sawah (X = 150)
         const sawahGroup = new THREE.Group();
         for(let i=0; i<4; i++){
@@ -326,7 +385,7 @@
         }
         sawahGroup.position.set(150, 0, 0); scene.add(sawahGroup);
 
-        // Gunung
+        // Gunung (Bisa Didaki)
         const mountain = new THREE.Mesh(new THREE.ConeGeometry(80, 150, 32), new THREE.MeshStandardMaterial({color: 0xd8bfd8}));
         mountain.position.set(-200, 75, 200); scene.add(mountain);
 
@@ -385,6 +444,18 @@
             scene.add(cloud);
         }
 
+        // Sistem Koin
+        let coinCount = 0;
+        const coins = [];
+        const coinGeo = new THREE.TorusGeometry(0.5, 0.15, 8, 16);
+        const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1, roughness: 0.1 });
+        for(let i=0; i<80; i++) {
+            const coin = new THREE.Mesh(coinGeo, coinMat);
+            coin.position.set((Math.random() - 0.5) * 200, 1.5, (Math.random() - 0.5) * 200);
+            scene.add(coin);
+            coins.push(coin);
+        }
+
         const npcs = [];
         const createNPC = (x, z, text) => {
             const npc = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.4, 1.2), new THREE.MeshStandardMaterial({ color: 0xffff00 }));
@@ -401,7 +472,8 @@
                 "Kalau capek jalan, cari motor yang parkir trus tekan E buat naik!",
                 "Pantai di selatan bagus banget buat mancing.",
                 "Sirkus raksasa itu... agak serem sih bentuknya.",
-                "Ngedash pake SHIFT bikin cepet banget berasa main Doom!"
+                "Ngedash pake SHIFT bikin cepet banget berasa main Doom!",
+                "Coba lari ke arah gunung di barat daya, bisa didaki loh!"
             ];
             createNPC((Math.random()-0.5)*200, (Math.random()-0.5)*200, dialogues[Math.floor(Math.random()*dialogues.length)]);
         }
@@ -462,6 +534,8 @@
 
         // Menu to Cutscene
         document.getElementById('start-btn').addEventListener('click', () => {
+            initAudio();
+            playSFX('click');
             gameState = 'CUTSCENE';
             uiElements.menu.style.opacity = '0';
             setTimeout(() => {
@@ -473,6 +547,7 @@
 
         // Cutscene to Game (PointerLock)
         document.getElementById('continue-btn').addEventListener('click', () => {
+            playSFX('click');
             document.body.requestPointerLock();
         });
 
@@ -497,10 +572,12 @@
 
         // Tombol Pause Menu
         document.getElementById('resume-btn').addEventListener('click', () => {
+            playSFX('click');
             document.body.requestPointerLock();
         });
         
         document.getElementById('quit-btn').addEventListener('click', () => {
+            playSFX('click');
             location.reload(); // Reset ke awal
         });
 
@@ -523,7 +600,7 @@
                 case 'KeyD': move.right = true; break;
                 case 'ShiftLeft': case 'ShiftRight': move.sprint = true; break;
                 case 'Space': 
-                    if (canJump) { velocity.y = 40; canJump = false; }
+                    if (canJump) { velocity.y = 40; canJump = false; playSFX('jump'); }
                     break;
                 case 'KeyE': 
                     if(nearestInteractable) {
@@ -583,8 +660,17 @@
                 camera.translateZ(velocity.z * delta);
                 camera.position.y += velocity.y * delta;
 
-                // Ground Collision
+                // Ground Collision & Mountain Climbing Logic
                 let floorHeight = isRiding ? 2.5 : 2.0;
+                
+                // Menghitung jarak ke gunung (-200, 200) untuk fitur mendaki
+                const distToMountain = Math.sqrt(Math.pow(camera.position.x - (-200), 2) + Math.pow(camera.position.z - 200, 2));
+                if (distToMountain < 80) {
+                    // Kamera akan menanjak mengikuti kemiringan cone gunung
+                    const mountainHeight = 150 * (1 - distToMountain / 80);
+                    floorHeight = Math.max(floorHeight, mountainHeight + (isRiding ? 2.5 : 2.0));
+                }
+
                 if (camera.position.y < floorHeight) {
                     velocity.y = 0; camera.position.y = floorHeight; canJump = true;
                 }
@@ -611,6 +697,19 @@
                 npcs.forEach(npc => {
                     npc.position.y = npc.userData.baseY + Math.sin(clock.getElapsedTime() * 3 + npc.position.x) * 0.15;
                 });
+
+                // Deteksi Koin (Ambil Koin)
+                for (let i = coins.length - 1; i >= 0; i--) {
+                    let coin = coins[i];
+                    coin.rotation.y += 3 * delta;
+                    if (camera.position.distanceTo(coin.position) < 3.5) {
+                        scene.remove(coin);
+                        coins.splice(i, 1);
+                        coinCount += 50000; // Rp 50.000 per koin
+                        document.getElementById('coin-counter').innerHTML = '<span class="label">DUIT:</span> <span class="val">Rp ' + coinCount.toLocaleString('id-ID') + '</span>';
+                        playSFX('coin');
+                    }
+                }
 
                 // Interaction Checks (Distance based)
                 let minDist = Infinity;
