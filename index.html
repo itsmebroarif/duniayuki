@@ -526,24 +526,21 @@
                     if (canJump) { velocity.y = 40; canJump = false; }
                     break;
                 case 'KeyE': 
-                if(nearestInteractable) {
-                    if(nearestInteractable.type === 'npc') {
-                        uiElements.dialogue.style.display = 'block';
-                        uiElements.dialogue.innerText = nearestInteractable.dialogue;
-                    } else if(nearestInteractable.type === 'job') {
-                        currentRole = nearestInteractable.role;
-                        uiElements.roleDisplay.innerHTML = '<span class="label">STATUS:</span> <span class="val">' + currentRole.toUpperCase() + '</span>';
-                        uiElements.prompt.innerText = "KERJAAN DITERIMA MANTAP!";
-                    } else if(nearestInteractable.type === 'vehicle') {
-                        isRiding = !isRiding;
-                        uiElements.prompt.innerText = isRiding ? "VROOOM! GAS NGAB!" : "Turun dari motor.";
-                        if(isRiding) camera.position.y = 2.5; else camera.position.y = 2;
-                    } else if(nearestInteractable.type === 'action') {
-                        uiElements.prompt.innerText = "Mancing santai... Dapet Lele!";
-                    }
-                }
-                break;
-        }
+                    if(nearestInteractable) {
+                        if(nearestInteractable.type === 'npc') {
+                            uiElements.dialogue.style.display = 'block';
+                            uiElements.dialogue.innerText = nearestInteractable.dialogue;
+                        } else if(nearestInteractable.type === 'job') {
+                            currentRole = nearestInteractable.role;
+                            uiElements.roleDisplay.innerHTML = '<span class="label">STATUS:</span> <span class="val">' + currentRole.toUpperCase() + '</span>';
+                            uiElements.prompt.innerText = "KERJAAN DITERIMA MANTAP!";
+                        } else if(nearestInteractable.type === 'vehicle') {
+                            isRiding = !isRiding;
+                            uiElements.prompt.innerText = isRiding ? "VROOOM! GAS NGAB!" : "Turun dari motor.";
+                            if(isRiding) camera.position.y = 2.5; else camera.position.y = 2;
+                        } else if(nearestInteractable.type === 'action') {
+                            uiElements.prompt.innerText = "Mancing santai... Dapet Lele!";
+                        }
                     }
                     break;
             }
