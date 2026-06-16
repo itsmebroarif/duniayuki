@@ -3,172 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dunia Yuki</title>
+    <title>Dunia Yuki - Ultimate Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #ffb6c1; /* Pink pastel background untuk fallback */
-            font-family: 'Press Start 2P', cursive; /* Mengubah seluruh font game menjadi 8-bit */
-            user-select: none;
-        }
-
-        /* --- UI MENU NES (8-BIT VIBE) --- */
-        #ui-layer {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; /* Layar hitam klasik NES */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            transition: opacity 0.5s ease;
-        }
-
-        .studio-logo {
-            color: #fff;
-            font-size: 0.8rem;
-            margin-bottom: 50px;
-            letter-spacing: 1px;
-            text-align: center;
-            line-height: 2;
-        }
-
-        #title {
-            color: #d82800; /* Merah khas palet NES */
-            text-shadow: 4px 4px 0 #fcfcfc; /* Bayangan tebal pixelated */
-            font-size: 4rem;
-            margin-bottom: 50px;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        #start-btn {
-            background: transparent;
-            color: #fff;
-            border: none;
+            background-color: #ffb6c1; /* Pink susu manis */
             font-family: 'Press Start 2P', cursive;
-            font-size: 1.2rem;
-            cursor: pointer;
-            pointer-events: auto;
-            animation: retroBlink 1s step-end infinite;
-        }
-
-        @keyframes retroBlink {
-            50% { opacity: 0; }
-        }
-
-        .controls-info {
-            margin-top: 60px;
-            background: #000;
-            border: 4px solid #fff; /* Kotak dialog ala RPG jadul */
-            padding: 20px;
+            user-select: none;
             color: #fff;
-            font-size: 0.7rem;
-            text-align: center;
-            line-height: 2.5;
         }
 
-        .highlight {
-            color: #f83800;
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; transition: opacity 0.5s ease;
         }
+        .studio-logo { font-size: 0.8rem; margin-bottom: 30px; line-height: 2; text-align: center; }
+        #title { color: #d82800; text-shadow: 4px 4px 0 #fcfcfc; font-size: 4rem; margin-bottom: 40px; text-align: center; line-height: 1.2; }
+        #start-btn { background: transparent; color: #fff; border: none; font-family: 'Press Start 2P', cursive; font-size: 1.2rem; cursor: pointer; pointer-events: auto; animation: retroBlink 1s step-end infinite; }
+        @keyframes retroBlink { 50% { opacity: 0; } }
+        .controls-info { margin-top: 40px; border: 4px solid #fff; padding: 20px; font-size: 0.7rem; text-align: center; line-height: 2; }
+        .highlight { color: #f83800; }
 
-        /* --- HUD (HEADS UP DISPLAY) --- */
+        #cutscene-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffb6c1;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 90; text-align: center; padding: 20px; box-sizing: border-box;
+        }
+        .cutscene-box {
+            background: #000; border: 6px solid #fff; padding: 40px; max-width: 800px;
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.5);
+        }
+        .nyx-name { color: #ff69b4; font-size: 1.5rem; margin-bottom: 20px; }
+        .nyx-dialogue { color: #fff; font-size: 1rem; line-height: 2; margin-bottom: 30px; }
+        #continue-btn { background: #fff; color: #000; border: none; padding: 15px 30px; font-family: 'Press Start 2P', cursive; cursor: pointer; }
+
         #hud {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            display: none;
-            z-index: 50;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: none; z-index: 50;
         }
-
-        .hud-top {
-            position: absolute;
-            top: 20px; left: 20px; right: 20px;
-            display: flex;
-            justify-content: space-between;
-            color: #fff;
-            text-shadow: 2px 2px 0 #000;
-            font-size: 1rem;
-        }
-
+        .hud-top { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; text-shadow: 2px 2px 0 #000; font-size: 0.8rem; }
+        .hud-bottom { position: absolute; bottom: 20px; left: 20px; text-shadow: 2px 2px 0 #000; font-size: 0.8rem; color: #00ffff;}
+        
         #interaction-prompt {
-            position: absolute;
-            bottom: 30%; left: 50%;
-            transform: translateX(-50%);
-            font-size: 1rem;
-            color: #fff;
-            background: #000;
-            border: 4px solid #fff;
-            padding: 15px 20px;
-            display: none;
+            position: absolute; bottom: 30%; left: 50%; transform: translateX(-50%);
+            font-size: 1rem; color: #fff; background: #000; border: 4px solid #fff; padding: 15px 20px; display: none; text-align: center; line-height: 1.5;
         }
-
         #dialogue-box {
-            position: absolute;
-            bottom: 5%; left: 15%; right: 15%;
-            background: #000;
-            color: #fff;
-            border: 4px solid #fff;
-            padding: 25px;
-            font-size: 0.9rem;
-            display: none;
-            text-align: left;
-            line-height: 1.8;
+            position: absolute; bottom: 10%; left: 15%; right: 15%;
+            background: #000; color: #fff; border: 4px solid #fff; padding: 25px; font-size: 0.8rem; display: none; text-align: left; line-height: 1.8;
         }
-
-        #crosshair {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 4px; height: 4px;
-            background: #fff;
-            box-shadow: 0 0 2px #000;
-            transform: translate(-50%, -50%);
-        }
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #fff; box-shadow: 0 0 2px #000; transform: translate(-50%, -50%); }
     </style>
     <!-- Import Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <!-- Audio BGM -->
     <audio id="bgm" src="ost.mp3" loop></audio>
 
-    <!-- UI Menu Awal NES Style -->
     <div id="ui-layer">
-        <div class="studio-logo">© 2026 YUKI CORP<br>LICENSED BY @EEXXVVN</div>
+        <div class="studio-logo">A GAME BY ARIF (@eexxvvn)</div>
         <h1 id="title">DUNIA<br>YUKI</h1>
         <button id="start-btn">PUSH START BUTTON</button>
         <div class="controls-info">
-            <span class="highlight">W A S D</span> : JALAN<br>
-            <span class="highlight">SHIFT</span> : LARI<br>
-            <span class="highlight">SPACE</span> : LOMPAT<br>
-            <span class="highlight">MOUSE</span> : NENGOK<br>
-            <span class="highlight">E</span> : INTERAKSI
+            [W A S D] JALAN | [SHIFT] LARI CEPAT<br><br>
+            [SPACE] LOMPAT | [MOUSE] NENGOK<br><br>
+            [E] INTERAKSI / KERJA / NAIK MOTOR
         </div>
     </div>
 
-    <!-- HUD saat dalam game retro-styled -->
+    <div id="cutscene-layer">
+        <div class="cutscene-box">
+            <div class="nyx-name">?? NYX ??</div>
+            <div class="nyx-dialogue">"ohh sayang kamu mau keliling yaudah hati hati ya gantengnya aku sayangnya dan cintanya aku unch unch hahaha"</div>
+            <button id="continue-btn">Mulai Petualangan</button>
+        </div>
+    </div>
+
     <div id="hud">
         <div class="hud-top">
             <div id="distance-counter">DIST: 0M</div>
             <div id="coin-counter">COINS: 0</div>
         </div>
+        <div class="hud-bottom" id="role-display">ROLE: PENGANGGURAN</div>
         <div id="interaction-prompt">PRESS [E]</div>
         <div id="dialogue-box">...</div>
         <div id="crosshair"></div>
     </div>
 
     <script>
-        // --- 1. SETUP SCENE, CAMERA, RENDERER ---
         const scene = new THREE.Scene();
         
-        // DREAMCORE AESTHETIC: Langit pink manis (HD Jernih)
+        // Langit pink susu manis
         const fogColor = new THREE.Color(0xffb6c1); 
         scene.background = fogColor;
-        scene.fog = new THREE.Fog(fogColor, 20, 250);
+        scene.fog = new THREE.Fog(fogColor, 20, 300);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 2, 0);
@@ -176,290 +110,284 @@
         const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Bayangan HD halus
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
         document.body.appendChild(renderer.domElement);
 
-        // --- 2. PENCAHAYAAN (LIGHTING) INTENS ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight.position.set(100, 150, 50);
+        const dirLight = new THREE.DirectionalLight(0xffeedd, 1.0);
+        dirLight.position.set(150, 200, 50);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048; // Resolusi bayangan HD
+        dirLight.shadow.mapSize.width = 2048; 
         dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 500;
-        dirLight.shadow.camera.left = -100;
-        dirLight.shadow.camera.right = 100;
-        dirLight.shadow.camera.top = 100;
-        dirLight.shadow.camera.bottom = -100;
+        dirLight.shadow.camera.near = 0.5; dirLight.shadow.camera.far = 600;
+        dirLight.shadow.camera.left = -200; dirLight.shadow.camera.right = 200;
+        dirLight.shadow.camera.top = 200; dirLight.shadow.camera.bottom = -200;
         scene.add(dirLight);
 
-        // --- 3. MATERIAL & TEXTURE GENERATOR ---
         const createCheckerboard = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 1024; canvas.height = 1024;
-            const context = canvas.getContext('2d');
-            context.fillStyle = '#111'; 
-            context.fillRect(0, 0, 1024, 1024);
-            context.fillStyle = '#f0f0f0'; 
-            context.fillRect(0, 0, 512, 512);
-            context.fillRect(512, 512, 512, 512);
+            const canvas = document.createElement('canvas'); canvas.width = 1024; canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#111'; ctx.fillRect(0, 0, 1024, 1024);
+            ctx.fillStyle = '#f0f0f0'; ctx.fillRect(0, 0, 512, 512); ctx.fillRect(512, 512, 512, 512);
             const tex = new THREE.CanvasTexture(canvas);
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(200, 200);
+            tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(250, 250);
             return tex;
         };
 
-        const createSignTexture = (text, bgColor, textColor) => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512; canvas.height = 256;
+        const createTextCanvas = (text, bgColor, textColor, size=60) => {
+            const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 256;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, 512, 256);
-            ctx.fillStyle = textColor;
-            ctx.font = 'bold 60px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+            ctx.fillStyle = bgColor; ctx.fillRect(0, 0, 512, 256);
+            ctx.fillStyle = textColor; ctx.font = `bold ${size}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText(text, 256, 128);
             return new THREE.CanvasTexture(canvas);
         };
 
-        // --- 4. MEMBANGUN DUNIA YANG LUAS ---
-        const floorGeo = new THREE.PlaneGeometry(1000, 1000);
+        const floorGeo = new THREE.PlaneGeometry(1200, 1200);
         const floorMat = new THREE.MeshStandardMaterial({ map: createCheckerboard(), roughness: 0.8 });
         const floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.rotation.x = -Math.PI / 2;
-        floor.receiveShadow = true;
+        floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
         scene.add(floor);
 
-        const roadGeo = new THREE.PlaneGeometry(25, 1000);
+        const roadGeo = new THREE.PlaneGeometry(30, 1200);
         const roadMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.9 });
         const road = new THREE.Mesh(roadGeo, roadMat);
-        road.rotation.x = -Math.PI / 2;
-        road.position.y = 0.05;
-        road.receiveShadow = true;
+        road.rotation.x = -Math.PI / 2; road.position.y = 0.05; road.receiveShadow = true;
         scene.add(road);
 
-        const buildings = [];
-        const createBuilding = (x, z, w, h, d, color, signText = null) => {
-            const geo = new THREE.BoxGeometry(w, h, d);
-            const mat = new THREE.MeshStandardMaterial({ color: color });
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(x, h/2, z);
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            scene.add(mesh);
-            buildings.push(mesh);
+        const interactables = []; // {pos, text, type, role/action}
 
+        const createBuilding = (x, z, w, h, d, color, signText = null) => {
+            const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: color }));
+            mesh.position.set(x, h/2, z); mesh.castShadow = true; mesh.receiveShadow = true;
+            scene.add(mesh);
             if (signText) {
-                const signGeo = new THREE.PlaneGeometry(w * 0.9, h * 0.4);
-                const signMat = new THREE.MeshBasicMaterial({ map: createSignTexture(signText, '#fff', '#000') });
-                const sign = new THREE.Mesh(signGeo, signMat);
-                sign.position.set(x, h + 0.2, z + d/2 + 0.05);
+                const sign = new THREE.Mesh(new THREE.PlaneGeometry(w * 0.9, h * 0.4), new THREE.MeshBasicMaterial({ map: createTextCanvas(signText, '#fff', '#000') }));
+                sign.position.set(x, h + 0.5, z + d/2 + 0.1);
                 scene.add(sign);
             }
             return mesh;
         };
 
-        const createTree = (x, z) => {
-            const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 4);
-            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x654321 });
-            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-            trunk.position.set(x, 2, z);
-            trunk.castShadow = true;
-            
-            const leavesGeo = new THREE.DodecahedronGeometry(2.5);
-            const leafColors = [0xffb6c1, 0xdda0dd, 0xadd8e6, 0x98fb98, 0xffe4b5];
-            const leavesMat = new THREE.MeshStandardMaterial({ color: leafColors[Math.floor(Math.random()*leafColors.length)] });
-            const leaves = new THREE.Mesh(leavesGeo, leavesMat);
-            leaves.position.set(x, 4.5, z);
-            leaves.castShadow = true;
-            
-            scene.add(trunk);
-            scene.add(leaves);
-        };
+        // Mall Raksasa TADC Colors
+        createBuilding(60, 40, 50, 40, 40, 0x00aaff, "MEGA MALL @eexxvvn");
+        interactables.push({ pos: new THREE.Vector3(60, 2, 65), text: "[E] Jadi Kasir Mall", type: "job", role: "Kasir Mall" });
+        
+        // Warkop & Cafe
+        createBuilding(-30, 20, 15, 8, 15, 0x00ff00, "WARKOP INDO");
+        interactables.push({ pos: new THREE.Vector3(-30, 2, 30), text: "[E] Jadi Abang Warkop", type: "job", role: "Abang Warkop" });
+        
+        createBuilding(30, -20, 12, 10, 12, 0xffff00, "AESTHETIC CAFE");
+        interactables.push({ pos: new THREE.Vector3(30, 2, -10), text: "[E] Jadi Barista", type: "job", role: "Barista Cafe" });
 
-        // Bangunan Utama
-        createBuilding(25, 0, 12, 8, 12, 0xffa07a, "Spudsy's");
-        createBuilding(-25, 20, 10, 6, 10, 0x8fbc8f, "Warkop");
-        createBuilding(40, 30, 20, 25, 20, 0xadd8e6, "Mall");
-        createBuilding(20, 50, 10, 8, 10, 0xffe4b5, "Cafe");
-        createBuilding(-35, -25, 8, 6, 8, 0xdda0dd, "Bar");
-        createBuilding(45, -15, 14, 9, 14, 0xf08080, "Restoran");
-        createBuilding(-20, -10, 5, 5, 5, 0xfffacd, "Pos Ronda");
-        createBuilding(20, -30, 4, 4, 4, 0xd3d3d3, "Angkringan");
+        // Kantor / Office (Programmer, Akuntan, Desainer)
+        createBuilding(-50, -40, 20, 25, 20, 0xff00ff, "TECH OFFICE");
+        interactables.push({ pos: new THREE.Vector3(-45, 2, -25), text: "[E] Jadi Programmer", type: "job", role: "Programmer" });
+        interactables.push({ pos: new THREE.Vector3(-50, 2, -25), text: "[E] Jadi Desainer", type: "job", role: "Desainer Grafis" });
+        interactables.push({ pos: new THREE.Vector3(-55, 2, -25), text: "[E] Jadi Akuntan", type: "job", role: "Akuntan" });
 
-        // Perumahan Kosong
-        for(let z = -150; z < 150; z += 25) {
-            if(z > -40 && z < 60) continue;
-            createBuilding(-40, z, 8, 6, 10, 0xffffff);
-            createBuilding(-55, z, 8, 6, 10, 0xffffff);
-        }
+        // Spudsy's & Restoran
+        createBuilding(25, 10, 12, 8, 12, 0xff0000, "Spudsy's");
+        createBuilding(45, 10, 15, 10, 15, 0xff5500, "Restoran Mewah");
 
-        // Kota Kecil
-        for(let i=0; i<40; i++) {
-            let bw = 3 + Math.random() * 4;
-            let bd = 3 + Math.random() * 4;
-            let bh = 15 + Math.random() * 40;
-            let bx = 80 + Math.random() * 50;
-            let bz = 80 + Math.random() * 50;
-            createBuilding(bx, bz, bw, bh, bd, 0xe0e0e0);
-        }
-
-        // Sirkus
-        const circusGeo = new THREE.ConeGeometry(20, 30, 16);
-        const circusMat = new THREE.MeshStandardMaterial({ color: 0xff69b4 }); 
-        const circus = new THREE.Mesh(circusGeo, circusMat);
-        circus.position.set(-60, 15, -80);
-        circus.castShadow = true;
+        // Sirkus Raksasa
+        const circus = new THREE.Group();
+        const circusBase = new THREE.Mesh(new THREE.CylinderGeometry(25, 25, 15, 32), new THREE.MeshStandardMaterial({color: 0xffffff}));
+        const circusTent = new THREE.Mesh(new THREE.ConeGeometry(28, 20, 32), new THREE.MeshStandardMaterial({color: 0xff0000}));
+        circusBase.position.y = 7.5; circusTent.position.y = 25;
+        circus.add(circusBase); circus.add(circusTent);
+        circus.position.set(-80, 0, -80);
         scene.add(circus);
 
+        // Pantai & Laut (Z = 200)
+        const sand = new THREE.Mesh(new THREE.PlaneGeometry(1200, 100), new THREE.MeshStandardMaterial({color: 0xf4a460}));
+        sand.rotation.x = -Math.PI/2; sand.position.set(0, 0.1, 250); scene.add(sand);
+        const sea = new THREE.Mesh(new THREE.PlaneGeometry(1200, 300), new THREE.MeshStandardMaterial({color: 0x1e90ff, transparent: true, opacity: 0.8}));
+        sea.rotation.x = -Math.PI/2; sea.position.set(0, 0.2, 450); scene.add(sea);
+        interactables.push({ pos: new THREE.Vector3(0, 2, 220), text: "[E] Mancing di Pantai", type: "action" });
+
+        // Sawah (X = 150)
+        const sawahGroup = new THREE.Group();
+        for(let i=0; i<4; i++){
+            const teras = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({color: 0x9acd32}));
+            teras.rotation.x = -Math.PI/2; teras.position.set(0, 0.1 + i*1.5, i*20);
+            sawahGroup.add(teras);
+        }
+        sawahGroup.position.set(150, 0, 0); scene.add(sawahGroup);
+
         // Gunung
-        const mountGeo = new THREE.ConeGeometry(40, 60, 32);
-        const mountMat = new THREE.MeshStandardMaterial({ color: 0xd8bfd8 });
-        const mountain = new THREE.Mesh(mountGeo, mountMat);
-        mountain.position.set(-80, 30, 100);
-        scene.add(mountain);
+        const mountain = new THREE.Mesh(new THREE.ConeGeometry(80, 150, 32), new THREE.MeshStandardMaterial({color: 0xd8bfd8}));
+        mountain.position.set(-200, 75, 200); scene.add(mountain);
 
-        for(let i=0; i<150; i++) {
-            createTree((Math.random() - 0.5) * 300, (Math.random() - 0.5) * 300);
-        }
-
-        // --- 5. ENTITAS BERGERAK ---
-        const animals = [];
-        for(let i=0; i<30; i++) {
-            const geo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-            const colors = [0xffffff, 0x000000, 0x8b4513, 0x808080];
-            const mat = new THREE.MeshStandardMaterial({ color: colors[Math.floor(Math.random()*colors.length)] });
-            const animal = new THREE.Mesh(geo, mat);
-            animal.position.set((Math.random() - 0.5) * 150, 0.4, (Math.random() - 0.5) * 150);
-            animal.userData = { dirX: (Math.random() - 0.5) * 0.08, dirZ: (Math.random() - 0.5) * 0.08 };
-            animal.castShadow = true;
-            scene.add(animal);
-            animals.push(animal);
-        }
-
-        const cars = [];
-        const createCar = (x, z, color, speed) => {
+        const createEnterableHouse = (x, z) => {
             const group = new THREE.Group();
-            const bodyGeo = new THREE.BoxGeometry(4, 2, 8);
-            const bodyMat = new THREE.MeshStandardMaterial({color: color, roughness: 0.3});
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            body.position.y = 1.2;
-            body.castShadow = true;
-            group.add(body);
+            const wallMat = new THREE.MeshStandardMaterial({color: 0xffffff});
+            const roofMat = new THREE.MeshStandardMaterial({color: 0x8b0000});
+            
+            // Walls
+            const backWall = new THREE.Mesh(new THREE.BoxGeometry(20, 10, 1), wallMat); backWall.position.set(0, 5, -10);
+            const leftWall = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 20), wallMat); leftWall.position.set(-10, 5, 0);
+            const rightWall = new THREE.Mesh(new THREE.BoxGeometry(1, 10, 20), wallMat); rightWall.position.set(10, 5, 0);
+            const frontWallL = new THREE.Mesh(new THREE.BoxGeometry(8, 10, 1), wallMat); frontWallL.position.set(-6, 5, 10);
+            const frontWallR = new THREE.Mesh(new THREE.BoxGeometry(8, 10, 1), wallMat); frontWallR.position.set(6, 5, 10);
+            const frontWallT = new THREE.Mesh(new THREE.BoxGeometry(4, 3, 1), wallMat); frontWallT.position.set(0, 8.5, 10); // Above door
+
+            // Roof
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(16, 8, 4), roofMat);
+            roof.rotation.y = Math.PI/4; roof.position.set(0, 14, 0);
+
+            // Interior: Bed & Desk
+            const bed = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 8), new THREE.MeshStandardMaterial({color: 0xadd8e6}));
+            bed.position.set(-6, 0.75, -5);
+            const desk = new THREE.Mesh(new THREE.BoxGeometry(5, 2.5, 3), new THREE.MeshStandardMaterial({color: 0x8b4513}));
+            desk.position.set(6, 1.25, -7);
+
+            group.add(backWall, leftWall, rightWall, frontWallL, frontWallR, frontWallT, roof, bed, desk);
             group.position.set(x, 0, z);
-            group.userData = { speed: speed };
             scene.add(group);
-            cars.push(group);
         };
-        createCar(6, 0, 0xff99cc, 40);
-        createCar(-6, 50, 0x99ccff, -45);
-        createCar(6, -100, 0xffff99, 35);
 
-        // --- 6. TELEPORTASI ---
-        const teleporters = [];
-        const createTeleport = (x, z, targetX, targetZ) => {
-            const geo = new THREE.CylinderGeometry(2.5, 2.5, 0.2, 32);
-            const mat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.6 });
-            const pad = new THREE.Mesh(geo, mat);
-            pad.position.set(x, 0.1, z);
-            pad.userData = { targetX, targetZ };
-            scene.add(pad);
-            teleporters.push(pad);
+        // Komplek Perumahan Mewah (Bisa Dimasuki)
+        for(let z = -100; z <= 100; z += 40) {
+            createEnterableHouse(-100, z);
+        }
+
+        // Komplek Tinggi (Apartemen)
+        for(let i=0; i<15; i++) {
+            createBuilding(80 + Math.random()*50, -80 - Math.random()*50, 15, 60 + Math.random()*40, 15, 0xcccccc);
+        }
+
+        const createTree = (x, z) => {
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.8, 5), new THREE.MeshStandardMaterial({color: 0x654321}));
+            trunk.position.set(x, 2.5, z);
+            const leaves = new THREE.Mesh(new THREE.DodecahedronGeometry(3.5), new THREE.MeshStandardMaterial({color: [0xffb6c1, 0xdda0dd, 0xadd8e6, 0x98fb98][Math.floor(Math.random()*4)]}));
+            leaves.position.set(x, 6, z);
+            scene.add(trunk); scene.add(leaves);
         };
-        createTeleport(0, 30, 100, 100);
-        createTeleport(100, 90, 0, 20);
+        for(let i=0; i<200; i++) createTree((Math.random()-0.5)*500, (Math.random()-0.5)*400);
 
-        // --- 7. TUJUAN AKHIR PORTAL ---
-        const portalGeo = new THREE.TorusGeometry(30, 2, 16, 64);
-        const portalMat = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true});
-        const portal = new THREE.Mesh(portalGeo, portalMat);
-        portal.position.set(0, 30, -350);
-        scene.add(portal);
-
-        // --- 8. SISTEM KOIN & NPC ---
-        let coinCount = 0;
-        const coins = [];
-        const coinGeo = new THREE.TorusGeometry(0.6, 0.2, 8, 16);
-        const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 });
-        
-        for(let i=0; i<80; i++) {
-            const coin = new THREE.Mesh(coinGeo, coinMat);
-            coin.position.set((Math.random() - 0.5) * 200, 1.5, (Math.random() - 0.5) * 200);
-            scene.add(coin);
-            coins.push(coin);
+        // Sedikit awan di langit
+        for(let i=0; i<8; i++){
+            const cloud = new THREE.Mesh(new THREE.SphereGeometry(15 + Math.random()*10, 16, 16), new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.8}));
+            cloud.position.set((Math.random()-0.5)*400, 80 + Math.random()*40, (Math.random()-0.5)*400);
+            cloud.scale.set(2, 0.8, 1.5);
+            scene.add(cloud);
         }
 
         const npcs = [];
         const createNPC = (x, z, text) => {
-            const npcGeo = new THREE.BoxGeometry(1.2, 2.4, 1.2);
-            const npcMat = new THREE.MeshStandardMaterial({ color: 0xffff00 });
-            const npc = new THREE.Mesh(npcGeo, npcMat);
-            npc.position.set(x, 1.2, z);
-            npc.castShadow = true;
-            npc.userData = { dialogue: text, baseY: 1.2 };
-            scene.add(npc);
-            npcs.push(npc);
+            const npc = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.4, 1.2), new THREE.MeshStandardMaterial({ color: 0xffff00 }));
+            npc.position.set(x, 1.2, z); npc.userData = { dialogue: text, baseY: 1.2 };
+            scene.add(npc); npcs.push(npc);
         };
 
-        createNPC(25, 15, "OIYA SPUDSY'S TUTUP JADI GAADA KENTANG GORENG HARI INI. LU TAU GAK DEVELOPER DUNIA INI? SI ARIF TUH!");
-        createNPC(-25, 25, "WARKOP BUKA TERUS BRAY! BTW UDAH CEK IG DEVELOPER KITA? @eexxvvn LOH!");
-        createNPC(40, 45, "MALLNYA KOSONG... KEK PIKIRAN SI ARIF PAS LAGI NYARI IDE CODE, WKWK!");
-        createNPC(20, 60, "DUNIA INI KEREN KAN? SENGGOL DONG SI ARIF @eexxvvn BIAR UPDATE LAGI!");
-        createNPC(-35, -15, "BAR NYA TUTUP NIH. MENDING KITA NONGKRONG SAMBIL CEK DISCORD @ITSMEBROARIF!");
-        createNPC(0, -20, "TIPS: TEKAN SPASI BUAT LOMPAT TINGGI! OIYA, KALIAN TAU KAN INI CUMA MIMPI!?");
-        createNPC(0, -40, "JALAN TERUS KE UTARA BRAY! ADA PORTAL. TAPI GATAU SI ARIF UDAH BIKIN DALEMNYA APA BELOM.");
+        // Massive amount of NPCs with varying dialogues
+        for(let i=0; i<40; i++){
+            let dialogues = [
+                "Developer dunia ini si Arif loh, follow IG nya @eexxvvn!",
+                "Udah coba masuk ke perumahan mewah di sebelah barat? Interiornya sama semua wkwk.",
+                "Aku denger kamu bisa kerja jadi Programmer di Tech Office.",
+                "Kalau capek jalan, cari motor yang parkir trus tekan E buat naik!",
+                "Pantai di selatan bagus banget buat mancing.",
+                "Sirkus raksasa itu... agak serem sih bentuknya.",
+                "Ngedash pake SHIFT bikin cepet banget berasa main Doom!"
+            ];
+            createNPC((Math.random()-0.5)*200, (Math.random()-0.5)*200, dialogues[Math.floor(Math.random()*dialogues.length)]);
+        }
 
-        // --- 9. KONTROL PEMAIN ---
+        // Vehicles (Cars & Motorcycles)
+        const vehicles = [];
+        const createVehicle = (x, z, color, speed, isMotorcycle = false) => {
+            const group = new THREE.Group();
+            if(!isMotorcycle) {
+                const body = new THREE.Mesh(new THREE.BoxGeometry(4, 2, 8), new THREE.MeshStandardMaterial({color: color}));
+                body.position.y = 1.2; group.add(body);
+            } else {
+                const body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 4), new THREE.MeshStandardMaterial({color: color}));
+                body.position.y = 1; group.add(body);
+                // Wheels
+                const w1 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 1.2), new THREE.MeshStandardMaterial({color: 0x111})); w1.rotation.z = Math.PI/2; w1.position.set(0, 0.8, 1.5);
+                const w2 = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 1.2), new THREE.MeshStandardMaterial({color: 0x111})); w2.rotation.z = Math.PI/2; w2.position.set(0, 0.8, -1.5);
+                group.add(w1); group.add(w2);
+            }
+            group.position.set(x, 0, z); group.userData = { speed: speed, type: isMotorcycle ? "motor" : "mobil" };
+            scene.add(group); vehicles.push(group);
+        };
+        
+        // Moving vehicles
+        createVehicle(6, 0, 0xff99cc, 60, false);
+        createVehicle(-6, 100, 0x99ccff, -65, false);
+        createVehicle(8, -50, 0xff0000, 75, true); // Moving motorcycle
+        createVehicle(-8, 200, 0x00ff00, -70, true);
+
+        // Rideable Parked Motorcycle
+        const rideableMotor = new THREE.Group();
+        const mBody = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 4), new THREE.MeshStandardMaterial({color: 0x00ffff})); mBody.position.y=1;
+        rideableMotor.add(mBody); rideableMotor.position.set(-15, 0, 10);
+        scene.add(rideableMotor);
+        interactables.push({ pos: new THREE.Vector3(-15, 1, 10), text: "[E] Naik Motor", type: "vehicle" });
+
         const move = { forward: false, backward: false, left: false, right: false, sprint: false };
         const velocity = new THREE.Vector3();
         const direction = new THREE.Vector3();
+        
+        let gameState = 'MENU'; // MENU, CUTSCENE, PLAYING
         let isLocked = false;
-        let nearestNPC = null;
+        let nearestInteractable = null;
         let canJump = true;
+        let currentRole = "Pengangguran";
+        let isRiding = false;
 
-        const startBtn = document.getElementById('start-btn');
-        const uiLayer = document.getElementById('ui-layer');
-        const hud = document.getElementById('hud');
-        const interactionPrompt = document.getElementById('interaction-prompt');
-        const dialogueBox = document.getElementById('dialogue-box');
-        const distanceCounterText = document.getElementById('distance-counter');
-        const coinCounterText = document.getElementById('coin-counter');
-        const bgm = document.getElementById('bgm');
+        const uiElements = {
+            menu: document.getElementById('ui-layer'),
+            cutscene: document.getElementById('cutscene-layer'),
+            hud: document.getElementById('hud'),
+            prompt: document.getElementById('interaction-prompt'),
+            dialogue: document.getElementById('dialogue-box'),
+            roleDisplay: document.getElementById('role-display'),
+            bgm: document.getElementById('bgm')
+        };
 
-        startBtn.addEventListener('click', () => {
+        // Menu to Cutscene
+        document.getElementById('start-btn').addEventListener('click', () => {
+            gameState = 'CUTSCENE';
+            uiElements.menu.style.opacity = '0';
+            setTimeout(() => {
+                uiElements.menu.style.display = 'none';
+                uiElements.cutscene.style.display = 'flex';
+                uiElements.bgm.play().catch(e => console.log("Audio block"));
+            }, 500);
+        });
+
+        // Cutscene to Game (PointerLock)
+        document.getElementById('continue-btn').addEventListener('click', () => {
             document.body.requestPointerLock();
-            bgm.play().catch(e => console.log("Audio play di-block browser."));
         });
 
         document.addEventListener('pointerlockchange', () => {
             if (document.pointerLockElement === document.body) {
+                gameState = 'PLAYING';
                 isLocked = true;
-                uiLayer.style.opacity = '0';
-                setTimeout(() => uiLayer.style.display = 'none', 500);
-                hud.style.display = 'block';
+                uiElements.cutscene.style.display = 'none';
+                uiElements.hud.style.display = 'block';
             } else {
                 isLocked = false;
-                uiLayer.style.display = 'flex';
-                uiLayer.style.opacity = '1';
-                hud.style.display = 'none';
-                dialogueBox.style.display = 'none';
+                if(gameState === 'PLAYING') {
+                    // Paused essentially, wait for user to click again to resume
+                    uiElements.hud.style.display = 'none';
+                    uiElements.dialogue.style.display = 'none';
+                }
             }
         });
 
         const euler = new THREE.Euler(0, 0, 0, 'YXZ');
         document.addEventListener('mousemove', (event) => {
             if (!isLocked) return;
-            const movementX = event.movementX || 0;
-            const movementY = event.movementY || 0;
-
             euler.setFromQuaternion(camera.quaternion);
-            euler.y -= movementX * 0.002;
-            euler.x -= movementY * 0.002;
+            euler.y -= event.movementX * 0.002;
+            euler.x -= event.movementY * 0.002;
             euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, euler.x));
             camera.quaternion.setFromEuler(euler);
         });
@@ -471,18 +399,26 @@
                 case 'KeyS': move.backward = true; break;
                 case 'KeyA': move.left = true; break;
                 case 'KeyD': move.right = true; break;
-                case 'ShiftLeft': 
-                case 'ShiftRight': move.sprint = true; break;
+                case 'ShiftLeft': case 'ShiftRight': move.sprint = true; break;
                 case 'Space': 
-                    if (canJump) {
-                        velocity.y = 40;
-                        canJump = false;
-                    }
+                    if (canJump) { velocity.y = 40; canJump = false; }
                     break;
                 case 'KeyE': 
-                    if(nearestNPC) {
-                        dialogueBox.style.display = 'block';
-                        dialogueBox.innerText = nearestNPC.userData.dialogue;
+                    if(nearestInteractable) {
+                        if(nearestInteractable.type === 'npc') {
+                            uiElements.dialogue.style.display = 'block';
+                            uiElements.dialogue.innerText = nearestInteractable.dialogue;
+                        } else if(nearestInteractable.type === 'job') {
+                            currentRole = nearestInteractable.role;
+                            uiElements.roleDisplay.innerText = "ROLE: " + currentRole.toUpperCase();
+                            uiElements.prompt.innerText = "Pekerjaan Diterima!";
+                        } else if(nearestInteractable.type === 'vehicle') {
+                            isRiding = !isRiding;
+                            uiElements.prompt.innerText = isRiding ? "VROOOM! LARI MAKIN CEPET!" : "Turun dari motor.";
+                            if(isRiding) camera.position.y = 2.5; else camera.position.y = 2;
+                        } else if(nearestInteractable.type === 'action') {
+                            uiElements.prompt.innerText = "Mancing santai... Dapet Sepatu Butut!";
+                        }
                     }
                     break;
             }
@@ -493,101 +429,92 @@
                 case 'KeyS': move.backward = false; break;
                 case 'KeyA': move.left = false; break;
                 case 'KeyD': move.right = false; break;
-                case 'ShiftLeft': 
-                case 'ShiftRight': move.sprint = false; break;
+                case 'ShiftLeft': case 'ShiftRight': move.sprint = false; break;
             }
         });
 
-        // --- 10. ANIMATION LOOP ---
         const clock = new THREE.Clock();
 
         function animate() {
             requestAnimationFrame(animate);
-            const delta = clock.getDelta();
+            const delta = Math.min(clock.getDelta(), 0.1);
 
             if (isLocked) {
-                // Fisika Gravitasi & Gerak
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
-                velocity.y -= 9.8 * 15.0 * delta; 
+                // Snappy Doom Physics (High Friction)
+                velocity.x -= velocity.x * 15.0 * delta;
+                velocity.z -= velocity.z * 15.0 * delta;
+                velocity.y -= 9.8 * 15.0 * delta; // Gravity
 
                 direction.z = Number(move.forward) - Number(move.backward);
-                direction.x = Number(move.left) - Number(move.right); // FIX: Logika A dan D sudah diperbaiki (tidak tertukar lagi)
+                direction.x = Number(move.left) - Number(move.right);
                 direction.normalize(); 
 
-                const speed = move.sprint ? 70.0 : 30.0;
+                // Speed calculation: Sprint is infinite. Motorcycle is ultra fast.
+                let baseSpeed = 40.0;
+                if(move.sprint) baseSpeed = 100.0; // Infinite sprint super fast
+                if(isRiding) baseSpeed = move.sprint ? 200.0 : 120.0;
 
-                if (move.forward || move.backward) velocity.z -= direction.z * speed * delta;
-                if (move.left || move.right) velocity.x -= direction.x * speed * delta;
+                if (move.forward || move.backward) velocity.z -= direction.z * baseSpeed * delta;
+                if (move.left || move.right) velocity.x -= direction.x * baseSpeed * delta;
 
                 camera.translateX(velocity.x * delta);
                 camera.translateZ(velocity.z * delta);
                 camera.position.y += velocity.y * delta;
 
-                if (camera.position.y < 2) {
-                    velocity.y = 0;
-                    camera.position.y = 2;
-                    canJump = true;
+                // Ground Collision
+                let floorHeight = isRiding ? 2.5 : 2.0;
+                if (camera.position.y < floorHeight) {
+                    velocity.y = 0; camera.position.y = floorHeight; canJump = true;
                 }
 
+                // Attach parked motorcycle to camera if riding
+                if(isRiding) {
+                    rideableMotor.position.x = camera.position.x;
+                    rideableMotor.position.z = camera.position.z;
+                    // Position model slightly below and ahead of camera
+                    rideableMotor.rotation.y = euler.y;
+                }
+
+                // Update HUD Distance
                 const distFromOrigin = Math.round(Math.sqrt(camera.position.x**2 + camera.position.z**2));
-                distanceCounterText.innerText = 'DIST: ' + distFromOrigin + 'M';
+                document.getElementById('distance-counter').innerText = 'DIST: ' + distFromOrigin + 'M';
 
-                portal.rotation.z += 0.5 * delta;
-
-                cars.forEach(car => {
-                    car.position.z += car.userData.speed * delta;
-                    if (car.position.z > 400) car.position.z = -500; 
-                    if (car.position.z < -500) car.position.z = 400;
-                });
-
-                animals.forEach(animal => {
-                    animal.position.x += animal.userData.dirX;
-                    animal.position.z += animal.userData.dirZ;
-                    if(animal.position.x > 150 || animal.position.x < -150) animal.userData.dirX *= -1;
-                    if(animal.position.z > 150 || animal.position.z < -150) animal.userData.dirZ *= -1;
-                    animal.rotation.y += 0.05;
+                // Entity Animations
+                vehicles.forEach(v => {
+                    v.position.z += v.userData.speed * delta;
+                    if (v.position.z > 600) v.position.z = -600; 
+                    if (v.position.z < -600) v.position.z = 600;
                 });
 
                 npcs.forEach(npc => {
-                    npc.position.y = npc.userData.baseY + Math.sin(clock.getElapsedTime() * 3) * 0.15;
+                    npc.position.y = npc.userData.baseY + Math.sin(clock.getElapsedTime() * 3 + npc.position.x) * 0.15;
                 });
 
-                teleporters.forEach(pad => {
-                    if (camera.position.distanceTo(pad.position) < 3) {
-                        camera.position.x = pad.userData.targetX;
-                        camera.position.z = pad.userData.targetZ;
-                    }
-                });
-
-                for (let i = coins.length - 1; i >= 0; i--) {
-                    let coin = coins[i];
-                    coin.rotation.y += 3 * delta;
-                    if (camera.position.distanceTo(coin.position) < 2.5) {
-                        scene.remove(coin);
-                        coins.splice(i, 1);
-                        coinCount++;
-                        coinCounterText.innerText = 'COINS: ' + coinCount;
-                    }
-                }
-
+                // Interaction Checks (Distance based)
                 let minDist = Infinity;
-                let activeNPC = null;
+                let activeNode = null;
+                
+                // Check NPCs
                 npcs.forEach(npc => {
                     let dist = camera.position.distanceTo(npc.position);
-                    if(dist < 5 && dist < minDist) {
-                        minDist = dist;
-                        activeNPC = npc;
-                    }
+                    if(dist < 5 && dist < minDist) { minDist = dist; activeNode = { type: 'npc', dialogue: npc.userData.dialogue }; }
                 });
 
-                if (activeNPC) {
-                    interactionPrompt.style.display = 'block';
-                    nearestNPC = activeNPC;
+                // Check Interactables (Jobs, Vehicles)
+                interactables.forEach(item => {
+                    let dist = camera.position.distanceTo(item.pos);
+                    if(dist < 8 && dist < minDist) { minDist = dist; activeNode = item; }
+                });
+
+                if (activeNode) {
+                    uiElements.prompt.style.display = 'block';
+                    if(activeNode.type === 'npc') uiElements.prompt.innerText = "PRESS [E] TALK";
+                    else uiElements.prompt.innerText = activeNode.text;
+                    nearestInteractable = activeNode;
                 } else {
-                    interactionPrompt.style.display = 'none';
-                    dialogueBox.style.display = 'none';
-                    nearestNPC = null;
+                    uiElements.prompt.style.display = 'none';
+                    uiElements.dialogue.style.display = 'none';
+                    nearestInteractable = null;
                 }
             }
 
