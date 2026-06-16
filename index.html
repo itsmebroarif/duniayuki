@@ -42,22 +42,122 @@
         .nyx-dialogue { color: #fff; font-size: 1rem; line-height: 2; margin-bottom: 30px; }
         #continue-btn { background: #fff; color: #000; border: none; padding: 15px 30px; font-family: 'Press Start 2P', cursive; cursor: pointer; }
 
+        /* --- HUD PERSONA X INDONESIA STYLE --- */
         #hud {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; display: none; z-index: 50;
+            font-family: 'Arial Black', Impact, sans-serif;
         }
-        .hud-top { position: absolute; top: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; text-shadow: 2px 2px 0 #000; font-size: 0.8rem; }
-        .hud-bottom { position: absolute; bottom: 20px; left: 20px; text-shadow: 2px 2px 0 #000; font-size: 0.8rem; color: #00ffff;}
-        
+        .persona-box {
+            background: #e60012; /* Merah bendera / Persona red */
+            color: #fff;
+            border: 4px solid #fff;
+            box-shadow: 8px 8px 0 #000;
+            transform: skewX(-15deg);
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            position: relative;
+            text-transform: uppercase;
+            overflow: hidden;
+        }
+        /* Motif corak simpel di background ala tribal/batik modern */
+        .persona-box::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.1) 10px, rgba(0,0,0,0.1) 20px);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .persona-box span {
+            position: relative; z-index: 1; text-shadow: 2px 2px 0 #000;
+        }
+        .persona-box .val { color: #ffd700; } /* Warna emas untuk value/duit */
+
+        .hud-top {
+            position: absolute; top: 20px; left: 20px; right: 20px;
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+        .hud-bottom {
+            position: absolute; bottom: 20px; left: 20px;
+        }
+
         #interaction-prompt {
-            position: absolute; bottom: 30%; left: 50%; transform: translateX(-50%);
-            font-size: 1rem; color: #fff; background: #000; border: 4px solid #fff; padding: 15px 20px; display: none; text-align: center; line-height: 1.5;
+            position: absolute; bottom: 30%; left: 50%;
+            transform: translateX(-50%) skewX(-10deg);
+            font-size: 1.5rem; color: #000;
+            background: #fff; border: 5px solid #e60012;
+            padding: 10px 30px; display: none; text-align: center;
+            box-shadow: 8px 8px 0 #000;
+            animation: pulsePrompt 0.5s infinite alternate;
+            font-weight: 900;
         }
+        @keyframes pulsePrompt {
+            0% { transform: translateX(-50%) skewX(-10deg) scale(1); }
+            100% { transform: translateX(-50%) skewX(-10deg) scale(1.1); }
+        }
+
         #dialogue-box {
-            position: absolute; bottom: 10%; left: 15%; right: 15%;
-            background: #000; color: #fff; border: 4px solid #fff; padding: 25px; font-size: 0.8rem; display: none; text-align: left; line-height: 1.8;
+            position: absolute; bottom: 5%; left: 10%; right: 10%;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            border-top: 8px solid #e60012;
+            border-bottom: 8px solid #fff;
+            border-left: 4px solid #e60012;
+            border-right: 4px solid #fff;
+            padding: 25px 40px;
+            font-size: 1.1rem; display: none; text-align: left; line-height: 1.8;
+            transform: skewX(-5deg);
+            box-shadow: 15px 15px 0 rgba(230, 0, 18, 0.5);
+            font-family: 'Press Start 2P', cursive; /* Retro font untuk dialog */
         }
-        #crosshair { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; background: #fff; box-shadow: 0 0 2px #000; transform: translate(-50%, -50%); }
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: #e60012; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 5px #000;}
+
+        /* --- PAUSE MENU P5 STYLE --- */
+        #pause-menu {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+            display: none; flex-direction: column; justify-content: center; align-items: flex-start;
+            z-index: 200; padding-left: 10%; overflow: hidden;
+            font-family: 'Arial Black', Impact, sans-serif;
+        }
+        .p5-bg-stripes {
+            position: absolute; top: -50%; left: -50%; width: 150%; height: 200%;
+            background: repeating-linear-gradient(45deg, #e60012, #e60012 20px, #b3000f 20px, #b3000f 40px);
+            z-index: -1; transform: rotate(-15deg); opacity: 0.95;
+            clip-path: polygon(0 0, 45% 0, 35% 100%, 0% 100%);
+            box-shadow: inset -20px 0 0 #fff; /* Garis putih tegas di pinggir merah */
+            border-right: 15px solid #fff;
+        }
+        .pause-title {
+            font-size: 6rem; color: #fff; text-shadow: 6px 6px 0 #000;
+            transform: rotate(-5deg) skewX(-15deg);
+            margin-bottom: 40px; letter-spacing: 5px; background: #000; padding: 10px 40px;
+            border: 5px solid #fff; z-index: 1; box-shadow: 15px 15px 0 #e60012;
+        }
+        .p5-btn-container { margin: 20px 0; z-index: 1; position: relative; perspective: 1000px; }
+        .p5-btn {
+            background: #000; color: #fff; border: 4px solid #fff;
+            font-family: 'Arial Black', Impact, sans-serif; font-size: 3rem;
+            padding: 10px 50px; cursor: pointer; text-transform: uppercase;
+            transform: rotate(2deg) skewX(-15deg);
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            position: relative; box-shadow: 10px 10px 0 #e60012;
+            overflow: hidden;
+        }
+        .p5-btn:hover {
+            background: #e60012; color: #fff;
+            transform: rotate(-2deg) skewX(-25deg) scale(1.15) translateX(20px);
+            box-shadow: -10px 15px 0 #000, 15px 15px 0 #fff;
+            border-color: #000; letter-spacing: 4px;
+        }
+        /* Efek garis bintang komik pas di hover */
+        .p5-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.2); transform: skewX(45deg); transition: all 0.3s;
+        }
+        .p5-btn:hover::before { left: 100%; }
     </style>
     <!-- Import Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -79,21 +179,30 @@
 
     <div id="cutscene-layer">
         <div class="cutscene-box">
-            <div class="nyx-name">?? NYX ??</div>
+            <div class="nyx-name">🌸 NYX 🌸</div>
             <div class="nyx-dialogue">"ohh sayang kamu mau keliling yaudah hati hati ya gantengnya aku sayangnya dan cintanya aku unch unch hahaha"</div>
             <button id="continue-btn">Mulai Petualangan</button>
         </div>
     </div>
 
+    <!-- HUD Persona x Indonesia -->
     <div id="hud">
         <div class="hud-top">
-            <div id="distance-counter">DIST: 0M</div>
-            <div id="coin-counter">COINS: 0</div>
+            <div id="distance-counter" class="persona-box"><span class="label">JARAK:</span> <span class="val">0M</span></div>
+            <div id="coin-counter" class="persona-box"><span class="label">DUIT:</span> <span class="val">Rp 0</span></div>
         </div>
-        <div class="hud-bottom" id="role-display">ROLE: PENGANGGURAN</div>
-        <div id="interaction-prompt">PRESS [E]</div>
+        <div class="hud-bottom persona-box" id="role-display"><span class="label">STATUS:</span> <span class="val">PENGANGGURAN</span></div>
+        <div id="interaction-prompt">TEKAN [E]</div>
         <div id="dialogue-box">...</div>
         <div id="crosshair"></div>
+    </div>
+
+    <!-- Pause Menu P5 Style -->
+    <div id="pause-menu">
+        <div class="p5-bg-stripes"></div>
+        <div class="pause-title">PAUSED</div>
+        <div class="p5-btn-container"><button class="p5-btn" id="resume-btn">LANJUT</button></div>
+        <div class="p5-btn-container"><button class="p5-btn" id="quit-btn">CABUT</button></div>
     </div>
 
     <script>
@@ -347,7 +456,8 @@
             prompt: document.getElementById('interaction-prompt'),
             dialogue: document.getElementById('dialogue-box'),
             roleDisplay: document.getElementById('role-display'),
-            bgm: document.getElementById('bgm')
+            bgm: document.getElementById('bgm'),
+            pauseMenu: document.getElementById('pause-menu')
         };
 
         // Menu to Cutscene
@@ -371,15 +481,27 @@
                 gameState = 'PLAYING';
                 isLocked = true;
                 uiElements.cutscene.style.display = 'none';
+                uiElements.pauseMenu.style.display = 'none';
                 uiElements.hud.style.display = 'block';
             } else {
                 isLocked = false;
                 if(gameState === 'PLAYING') {
                     // Paused essentially, wait for user to click again to resume
+                    gameState = 'PAUSED';
                     uiElements.hud.style.display = 'none';
                     uiElements.dialogue.style.display = 'none';
+                    uiElements.pauseMenu.style.display = 'flex';
                 }
             }
+        });
+
+        // Tombol Pause Menu
+        document.getElementById('resume-btn').addEventListener('click', () => {
+            document.body.requestPointerLock();
+        });
+        
+        document.getElementById('quit-btn').addEventListener('click', () => {
+            location.reload(); // Reset ke awal
         });
 
         const euler = new THREE.Euler(0, 0, 0, 'YXZ');
@@ -404,21 +526,24 @@
                     if (canJump) { velocity.y = 40; canJump = false; }
                     break;
                 case 'KeyE': 
-                    if(nearestInteractable) {
-                        if(nearestInteractable.type === 'npc') {
-                            uiElements.dialogue.style.display = 'block';
-                            uiElements.dialogue.innerText = nearestInteractable.dialogue;
-                        } else if(nearestInteractable.type === 'job') {
-                            currentRole = nearestInteractable.role;
-                            uiElements.roleDisplay.innerText = "ROLE: " + currentRole.toUpperCase();
-                            uiElements.prompt.innerText = "Pekerjaan Diterima!";
-                        } else if(nearestInteractable.type === 'vehicle') {
-                            isRiding = !isRiding;
-                            uiElements.prompt.innerText = isRiding ? "VROOOM! LARI MAKIN CEPET!" : "Turun dari motor.";
-                            if(isRiding) camera.position.y = 2.5; else camera.position.y = 2;
-                        } else if(nearestInteractable.type === 'action') {
-                            uiElements.prompt.innerText = "Mancing santai... Dapet Sepatu Butut!";
-                        }
+                if(nearestInteractable) {
+                    if(nearestInteractable.type === 'npc') {
+                        uiElements.dialogue.style.display = 'block';
+                        uiElements.dialogue.innerText = nearestInteractable.dialogue;
+                    } else if(nearestInteractable.type === 'job') {
+                        currentRole = nearestInteractable.role;
+                        uiElements.roleDisplay.innerHTML = '<span class="label">STATUS:</span> <span class="val">' + currentRole.toUpperCase() + '</span>';
+                        uiElements.prompt.innerText = "KERJAAN DITERIMA MANTAP!";
+                    } else if(nearestInteractable.type === 'vehicle') {
+                        isRiding = !isRiding;
+                        uiElements.prompt.innerText = isRiding ? "VROOOM! GAS NGAB!" : "Turun dari motor.";
+                        if(isRiding) camera.position.y = 2.5; else camera.position.y = 2;
+                    } else if(nearestInteractable.type === 'action') {
+                        uiElements.prompt.innerText = "Mancing santai... Dapet Lele!";
+                    }
+                }
+                break;
+        }
                     }
                     break;
             }
@@ -450,9 +575,9 @@
                 direction.normalize(); 
 
                 // Speed calculation: Sprint is infinite. Motorcycle is ultra fast.
-                let baseSpeed = 40.0;
-                if(move.sprint) baseSpeed = 100.0; // Infinite sprint super fast
-                if(isRiding) baseSpeed = move.sprint ? 200.0 : 120.0;
+                let baseSpeed = 100.0; // Jalan kaki biasa sekarang setara sprint Doom lama
+                if(move.sprint) baseSpeed = 125.0; // Sprint dinaikkan 25% lebih cepat lagi!
+                if(isRiding) baseSpeed = move.sprint ? 250.0 : 150.0; // Motor ikut di-upgrade biar makin ngacir
 
                 if (move.forward || move.backward) velocity.z -= direction.z * baseSpeed * delta;
                 if (move.left || move.right) velocity.x -= direction.x * baseSpeed * delta;
@@ -477,7 +602,7 @@
 
                 // Update HUD Distance
                 const distFromOrigin = Math.round(Math.sqrt(camera.position.x**2 + camera.position.z**2));
-                document.getElementById('distance-counter').innerText = 'DIST: ' + distFromOrigin + 'M';
+                document.getElementById('distance-counter').innerHTML = '<span class="label">JARAK:</span> <span class="val">' + distFromOrigin + 'M</span>';
 
                 // Entity Animations
                 vehicles.forEach(v => {
