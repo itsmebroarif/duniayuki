@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dunia Yuki</title>
+    <title>Dunia Yuki - Full Version (NES Menu)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
@@ -138,7 +138,7 @@
 
     <!-- UI Menu Awal NES Style -->
     <div id="ui-layer">
-        <div class="studio-logo">© 2026 YUKI CORP<br>LICENSED BY KAFEINARTS</div>
+        <div class="studio-logo">© 2026 YUKI CORP<br>LICENSED BY NINTENDO</div>
         <h1 id="title">DUNIA<br>YUKI</h1>
         <button id="start-btn">PUSH START BUTTON</button>
         <div class="controls-info">
@@ -406,13 +406,13 @@
             npcs.push(npc);
         };
 
-        createNPC(25, 15, "SELAMAT DATANG DI SPUDSY'S! BELI KENTANG?");
-        createNPC(-25, 25, "WARKOP INI SELALU BUKA. KOPINYA MANTAP!");
-        createNPC(40, 45, "MALL INI SEPI BANGET... AKU TAKUT.");
-        createNPC(20, 60, "TEMPAT INI TERASA SEPERTI MIMPI, YA KAN?");
-        createNPC(-35, -15, "BAR NYA TUTUP. KITA MAIN KE PANTAI AJA YUK!");
-        createNPC(0, -20, "TIPS: TEKAN SPASI UNTUK LOMPAT TINGGI!");
-        createNPC(0, -40, "TERUS JALAN KE UTARA (-Z), ADA PORTAL RAKSASA MENUNGGUMU!");
+        createNPC(25, 15, "YOO BRO! WELCOME TO SPUDSY'S. LU TAU GAK DEVELOPER DUNIA INI? SI ARIF TUH!");
+        createNPC(-25, 25, "WARKOP BUKA TERUS BRAY! BTW UDAH CEK IG DEVELOPER KITA? @eexxvvn LOH!");
+        createNPC(40, 45, "MALLNYA KOSONG... KEK PIKIRAN SI ARIF PAS LAGI NYARI IDE CODE, WKWK!");
+        createNPC(20, 60, "DUNIA INI KEREN KAN? SENGGOL DONG SI ARIF @eexxvvn BIAR UPDATE LAGI!");
+        createNPC(-35, -15, "BAR NYA TUTUP NIH. MENDING KITA NONGKRONG SAMBIL FOLLOW IG NYA @eexxvvn!");
+        createNPC(0, -20, "TIPS: TEKAN SPASI BUAT LOMPAT TINGGI! MAKASIH LOH RIF UDAH BIKIN GRAVITASI!");
+        createNPC(0, -40, "JALAN TERUS KE UTARA BRAY! ADA PORTAL. TAPI GATAU SI ARIF UDAH BIKIN DALEMNYA APA BELOM.");
 
         // --- 9. KONTROL PEMAIN ---
         const move = { forward: false, backward: false, left: false, right: false, sprint: false };
@@ -512,7 +512,7 @@
                 velocity.y -= 9.8 * 15.0 * delta; 
 
                 direction.z = Number(move.forward) - Number(move.backward);
-                direction.x = Number(move.right) - Number(move.left);
+                direction.x = Number(move.left) - Number(move.right); // FIX: Logika A dan D sudah diperbaiki (tidak tertukar lagi)
                 direction.normalize(); 
 
                 const speed = move.sprint ? 70.0 : 30.0;
