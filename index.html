@@ -3,115 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dunia Yuki - Dreamcore Prototype</title>
+    <title>Dunia Yuki</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #ffc0cb; /* Pastel pink */
-            font-family: 'Courier New', Courier, monospace;
+            background-color: #ffb6c1; /* Pink pastel background */
+            font-family: 'Courier New', Courier, monospace; /* PS1 Font Style */
             user-select: none;
         }
+
+        /* --- CRT SCANLINE EFFECT (PS1 VIBE) --- */
+        .crt::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* --- UI MENU ALA PS1 --- */
         #ui-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
+            background: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            z-index: 100;
         }
-        #title {
+
+        .ps1-logo {
             color: #fff;
-            text-shadow: 0 0 10px #ff69b4, 0 0 20px #ff69b4;
-            font-size: 4rem;
-            margin-bottom: 10px;
-            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
         }
-        #instructions {
-            color: #333;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 15px 30px;
-            border-radius: 10px;
+
+        #title {
+            color: #ffb6c1;
+            text-shadow: 2px 2px 0 #fff;
+            font-size: 5rem;
+            margin-bottom: 40px;
             text-align: center;
             font-weight: bold;
-            pointer-events: auto;
+        }
+
+        #start-btn {
+            background: transparent;
+            color: #fff;
+            border: none;
+            font-size: 2rem;
+            font-family: 'Courier New', Courier, monospace;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            pointer-events: auto;
+            animation: blinker 1s linear infinite;
         }
-        #instructions:hover {
-            transform: scale(1.05);
+
+        @keyframes blinker {
+            50% { opacity: 0; }
         }
+
+        .controls-info {
+            margin-top: 60px;
+            color: #aaa;
+            font-size: 1rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* --- HUD (HEADS UP DISPLAY) --- */
+        #hud {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: none;
+            z-index: 50;
+        }
+
+        .hud-top {
+            position: absolute;
+            top: 20px; left: 20px; right: 20px;
+            display: flex;
+            justify-content: space-between;
+            color: #fff;
+            text-shadow: 2px 2px 0 #000;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        #interaction-prompt {
+            position: absolute;
+            bottom: 30%; left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border: 2px solid #fff;
+            display: none;
+        }
+
+        #dialogue-box {
+            position: absolute;
+            bottom: 10%; left: 15%; right: 15%;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 20px;
+            font-size: 1.2rem;
+            display: none;
+        }
+
         #crosshair {
             position: absolute;
             top: 50%; left: 50%;
-            width: 10px; height: 10px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
+            width: 4px; height: 4px;
+            background: #fff;
             transform: translate(-50%, -50%);
-            display: none;
         }
     </style>
     <!-- Import Three.js -->
+    <!-- Import Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
-<body>
+<body class="crt">
 
+    <!-- Audio BGM -->
+    <audio id="bgm" src="ost.mp3" loop></audio>
+
+    <!-- UI Menu Awal PS1 Style -->
     <div id="ui-layer">
+        <div class="ps1-logo">YUKI COMPUTER ENTERTAINMENT</div>
         <h1 id="title">DUNIA YUKI</h1>
-        <div id="instructions">
-            Klik di sini untuk menjelajah<br><br>
-            [W][A][S][D] untuk Berjalan<br>
-            [Mouse] untuk Melihat Sekitar
+        <button id="start-btn">PRESS START BUTTON</button>
+        <div class="controls-info">
+            MEMORY CARD (16MB) DETECTED<br><br>
+            [W A S D] Move | [SHIFT] Run | [MOUSE] Look<br>
+            [E] Action / Talk
         </div>
     </div>
-    <div id="crosshair"></div>
+
+    <!-- HUD saat dalam game -->
+    <div id="hud">
+        <div class="hud-top">
+            <div id="distance-counter">Jarak: 0m</div>
+            <div id="coin-counter">Koin: 0</div>
+        </div>
+        <div id="interaction-prompt">Tekan [E] Action</div>
+        <div id="dialogue-box">...</div>
+        <div id="crosshair"></div>
+    </div>
 
     <script>
         // --- 1. SETUP SCENE, CAMERA, RENDERER ---
         const scene = new THREE.Scene();
-        // Langit dan kabut pink (Dreamcore aesthetic)
-        const fogColor = new THREE.Color(0xffd1dc); 
+        
+        // DREAMCORE AESTHETIC: Langit pink manis
+        const fogColor = new THREE.Color(0xffb6c1); 
         scene.background = fogColor;
-        scene.fog = new THREE.Fog(fogColor, 5, 100);
+        scene.fog = new THREE.Fog(fogColor, 10, 150);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 2, 0); // Tinggi pemain
+        camera.position.set(0, 2, 0);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
 
-        // --- 2. PENCAHAYAAN (LIGHTING) ---
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); // Cahaya lembut
+        // --- 2. PENCAHAYAAN (LIGHTING) INTENS ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffe4e1, 0.6); // Cahaya matahari pastel
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.0); // Matahari sangat terang
         dirLight.position.set(50, 100, 50);
         dirLight.castShadow = true;
         scene.add(dirLight);
 
         // --- 3. MATERIAL & TEXTURE GENERATOR ---
-        // Membuat tekstur papan catur dengan Canvas API
         const createCheckerboard = () => {
             const canvas = document.createElement('canvas');
             canvas.width = 512; canvas.height = 512;
             const context = canvas.getContext('2d');
-            context.fillStyle = '#111'; // Hitam
+            // Warna kontras tinggi ala TADC
+            context.fillStyle = '#050505'; 
             context.fillRect(0, 0, 512, 512);
-            context.fillStyle = '#eee'; // Putih
+            context.fillStyle = '#fafafa'; 
             context.fillRect(0, 0, 256, 256);
             context.fillRect(256, 256, 256, 256);
             const tex = new THREE.CanvasTexture(canvas);
             tex.wrapS = THREE.RepeatWrapping;
             tex.wrapT = THREE.RepeatWrapping;
-            tex.repeat.set(100, 100); // Pengulangan lantai
+            tex.repeat.set(100, 100); 
             return tex;
         };
 
-        // Membuat tekstur papan nama bangunan
         const createSignTexture = (text, bgColor, textColor) => {
             const canvas = document.createElement('canvas');
             canvas.width = 256; canvas.height = 128;
@@ -119,36 +210,33 @@
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, 256, 128);
             ctx.fillStyle = textColor;
-            ctx.font = 'bold 30px Arial';
+            ctx.font = 'bold 36px Arial Black';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(text, 128, 64);
             return new THREE.CanvasTexture(canvas);
         };
 
-        // --- 4. MEMBANGUN DUNIA ---
-        // Lantai Papan Catur
+        // --- 4. MEMBANGUN DUNIA YANG COLORFUL ---
         const floorGeo = new THREE.PlaneGeometry(500, 500);
-        const floorMat = new THREE.MeshStandardMaterial({ map: createCheckerboard(), roughness: 0.8 });
+        const floorMat = new THREE.MeshStandardMaterial({ map: createCheckerboard(), roughness: 0.5 });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Jalan Raya
         const roadGeo = new THREE.PlaneGeometry(20, 500);
-        const roadMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+        const roadMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
         const road = new THREE.Mesh(roadGeo, roadMat);
         road.rotation.x = -Math.PI / 2;
-        road.position.y = 0.01; // Sedikit di atas lantai
+        road.position.y = 0.01;
         road.receiveShadow = true;
         scene.add(road);
 
-        // Fungsi pembuat bangunan
         const buildings = [];
         const createBuilding = (x, z, w, h, d, color, signText = null) => {
             const geo = new THREE.BoxGeometry(w, h, d);
-            const mat = new THREE.MeshStandardMaterial({ color: color });
+            const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.2, metalness: 0.1 });
             const mesh = new THREE.Mesh(geo, mat);
             mesh.position.set(x, h/2, z);
             mesh.castShadow = true;
@@ -157,7 +245,7 @@
             buildings.push(mesh);
 
             if (signText) {
-                const signGeo = new THREE.PlaneGeometry(w * 0.8, h * 0.3);
+                const signGeo = new THREE.PlaneGeometry(w * 0.9, h * 0.3);
                 const signMat = new THREE.MeshBasicMaterial({ map: createSignTexture(signText, '#fff', '#000') });
                 const sign = new THREE.Mesh(signGeo, signMat);
                 sign.position.set(x, h + 0.1, z + d/2 + 0.01);
@@ -166,126 +254,134 @@
             return mesh;
         };
 
-        // Fungsi pembuat pohon surealis
         const createTree = (x, z) => {
-            const trunkGeo = new THREE.CylinderGeometry(0.2, 0.2, 2);
-            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c4033 });
+            const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 3);
+            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
             const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-            trunk.position.set(x, 1, z);
+            trunk.position.set(x, 1.5, z);
             
-            const leavesGeo = new THREE.SphereGeometry(1.5, 8, 8);
-            // Daun warnanya pastel aneh-aneh
-            const leafColors = [0xffb6c1, 0xdda0dd, 0xadd8e6, 0x98fb98];
+            const leavesGeo = new THREE.SphereGeometry(2, 12, 12);
+            // Palet Warna TADC Super Intens
+            const leafColors = [0xff0000, 0xffff00, 0x00ff00, 0xff00ff, 0x00ffff, 0xff5500];
             const leavesMat = new THREE.MeshStandardMaterial({ color: leafColors[Math.floor(Math.random()*leafColors.length)] });
             const leaves = new THREE.Mesh(leavesGeo, leavesMat);
-            leaves.position.set(x, 2.5, z);
+            leaves.position.set(x, 4, z);
             
             scene.add(trunk);
             scene.add(leaves);
         };
 
-        // Kota Kecil (Micro-city) di sudut
-        for(let i=0; i<30; i++) {
-            let bw = 2 + Math.random() * 3;
-            let bd = 2 + Math.random() * 3;
-            let bh = 10 + Math.random() * 30;
-            let bx = 50 + Math.random() * 40;
-            let bz = 50 + Math.random() * 40;
-            createBuilding(bx, bz, bw, bh, bd, 0xe0e0e0);
-        }
+        // Bangunan Ekstra & Trip Locations (Warna Ngejreng!)
+        createBuilding(20, 0, 10, 8, 10, 0xff0000, "Spudsy's"); // Merah
+        createBuilding(-20, 15, 8, 5, 8, 0x00ff00, "Warkop");   // Hijau
+        createBuilding(35, 20, 15, 20, 15, 0x0000ff, "Mall");    // Biru
+        createBuilding(20, 40, 8, 6, 8, 0xffff00, "Cafe");      // Kuning
+        createBuilding(-30, -25, 7, 5, 7, 0xff00ff, "Bar");     // Magenta
+        createBuilding(40, -15, 12, 7, 12, 0xff5500, "Restoran"); // Oranye
+        createBuilding(-20, -10, 5, 5, 5, 0x00ffff, "Pos Ronda"); // Cyan
 
-        // Area Gunung (Representasi Liminal Cone)
-        const mountGeo = new THREE.ConeGeometry(30, 40, 32);
-        const mountMat = new THREE.MeshStandardMaterial({ color: 0xd8bfd8 }); // Thistle
-        const mountain = new THREE.Mesh(mountGeo, mountMat);
-        mountain.position.set(-60, 20, -80);
-        scene.add(mountain);
-
-        // Membangun Toko & Landmark
-        createBuilding(15, 0, 8, 5, 8, 0xffa07a, "Spudsy's");
-        createBuilding(-15, 10, 5, 3, 5, 0x8fbc8f, "Warkop");
-        createBuilding(-15, -10, 4, 4, 4, 0xfffacd, "Pos Ronda");
-        createBuilding(15, 30, 6, 4, 6, 0xe6e6fa, "Cafe");
-        createBuilding(15, -20, 3, 3, 3, 0xffe4b5, "Angkringan");
-
-        // Sirkus di kejauhan
-        const circusGeo = new THREE.ConeGeometry(10, 15, 8);
-        const circusMat = new THREE.MeshStandardMaterial({ color: 0xff69b4 }); // Hot pink
+        // Sirkus TADC
+        const circusGeo = new THREE.ConeGeometry(15, 25, 16);
+        const circusMat = new THREE.MeshStandardMaterial({ color: 0xff0000 }); 
         const circus = new THREE.Mesh(circusGeo, circusMat);
-        circus.position.set(-20, 7.5, -60);
+        circus.position.set(-40, 12.5, -60);
         scene.add(circus);
 
-        // Rumah-rumah kosong identik (Suburban)
-        for(let z = -80; z < 80; z += 20) {
-            if(z > -15 && z < 15) continue; // Kosongkan area tengah
-            createBuilding(-30, z, 6, 5, 8, 0xffffff);
-            createBuilding(-40, z, 6, 5, 8, 0xffffff);
+        // Sebar pohon
+        for(let i=0; i<80; i++) {
+            createTree((Math.random() - 0.5) * 200, (Math.random() - 0.5) * 200);
         }
 
-        // Sebar pohon di sekitar
-        for(let i=0; i<50; i++) {
-            createTree((Math.random() - 0.5) * 150, (Math.random() - 0.5) * 150);
-        }
-
-        // --- 5. HEWAN (NPC SEDERHANA) ---
-        const animals = [];
-        for(let i=0; i<20; i++) {
-            const geo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-            // Warna merepresentasikan hewan
-            const colors = [0xffffff, 0x000000, 0x8b4513]; 
-            const mat = new THREE.MeshStandardMaterial({ color: colors[Math.floor(Math.random()*colors.length)] });
-            const animal = new THREE.Mesh(geo, mat);
-            animal.position.set((Math.random() - 0.5) * 60, 0.25, (Math.random() - 0.5) * 60);
-            
-            // Simpan arah jalan acak
-            animal.userData = {
-                dirX: (Math.random() - 0.5) * 0.05,
-                dirZ: (Math.random() - 0.5) * 0.05
-            };
-            scene.add(animal);
-            animals.push(animal);
-        }
-
-        // --- 6. TELEPORTASI PADS ---
-        const teleporters = [];
-        const createTeleport = (x, z, targetX, targetZ) => {
-            const geo = new THREE.CylinderGeometry(2, 2, 0.1, 16);
-            const mat = new THREE.MeshBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0.5 });
-            const pad = new THREE.Mesh(geo, mat);
-            pad.position.set(x, 0.06, z);
-            pad.userData = { targetX, targetZ };
-            scene.add(pad);
-            teleporters.push(pad);
+        // --- 4.5. KENDARAAN (CARS) ---
+        const cars = [];
+        const createCar = (x, z, color, speed) => {
+            const group = new THREE.Group();
+            const bodyGeo = new THREE.BoxGeometry(3, 1.5, 6);
+            const bodyMat = new THREE.MeshStandardMaterial({color: color, roughness: 0.3});
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 1;
+            body.castShadow = true;
+            group.add(body);
+            group.position.set(x, 0, z);
+            group.userData = { speed: speed };
+            scene.add(group);
+            cars.push(group);
         };
-        // Teleport dari jalan raya ke kota kecil
-        createTeleport(0, 20, 60, 60);
-        // Teleport dari kota kecil balik ke jalan raya
-        createTeleport(60, 50, 0, 10);
+        createCar(5, 0, 0xff99cc, 40);   // Mobil Pink
+        createCar(-5, 50, 0x99ccff, -45); // Mobil Biru
+        createCar(5, -100, 0xffff99, 35); // Mobil Kuning
 
-        // --- 7. KONTROL PEMAIN (FIRST PERSON) ---
-        const move = { forward: false, backward: false, left: false, right: false };
+        // --- 4.6. TUJUAN AKHIR (END OF WORLD PORTAL) ---
+        const portalGeo = new THREE.TorusGeometry(30, 2, 16, 64);
+        const portalMat = new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true});
+        const portal = new THREE.Mesh(portalGeo, portalMat);
+        portal.position.set(0, 30, -350); // Jauh di ujung jalan
+        scene.add(portal);
+
+        // --- 5. SISTEM KOIN EMAS ---
+        let coinCount = 0;
+        const coins = [];
+        const coinGeo = new THREE.TorusGeometry(0.5, 0.15, 8, 16);
+        const coinMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1, roughness: 0.1 });
+        
+        for(let i=0; i<60; i++) {
+            const coin = new THREE.Mesh(coinGeo, coinMat);
+            coin.position.set((Math.random() - 0.5) * 150, 1.5, (Math.random() - 0.5) * 150);
+            scene.add(coin);
+            coins.push(coin);
+        }
+
+        // --- 6. NPC BAIK HATI (SISTEM DIALOG) ---
+        const npcs = [];
+        const createNPC = (x, z, text) => {
+            const npcGeo = new THREE.BoxGeometry(1, 2, 1);
+            const npcMat = new THREE.MeshStandardMaterial({ color: 0xffff00 }); // Warna kuning terang biar gampang dicari
+            const npc = new THREE.Mesh(npcGeo, npcMat);
+            npc.position.set(x, 1, z);
+            npc.userData = { dialogue: text, baseY: 1 };
+            scene.add(npc);
+            npcs.push(npc);
+        };
+
+        // Letakkan NPC di dekat bangunan (POI)
+        createNPC(20, 12, "Halo! Kata orang di ujung jalan raya ada portal raksasa...");
+        createNPC(-20, 20, "Warkop ini buka 24 jam. Nyantai dulu aja!");
+        createNPC(35, 30, "Mall nya gede tapi kosong melompong. Aneh ya?");
+        createNPC(18, 48, "Kamu suka langit pink ini? Rasanya kaya di mimpi.");
+        createNPC(-30, -18, "Bar nya tutup, mending kita jalan-jalan aja.");
+        createNPC(0, -10, "Tekan SHIFT untuk lari cepat. Jalan lurus terus ke arah utara (-Z)!");
+
+        // --- 7. KONTROL PEMAIN & LOGIKA ---
+        const move = { forward: false, backward: false, left: false, right: false, sprint: false };
         const velocity = new THREE.Vector3();
         const direction = new THREE.Vector3();
         let isLocked = false;
+        let nearestNPC = null;
 
-        const instructions = document.getElementById('instructions');
+        const startBtn = document.getElementById('start-btn');
         const uiLayer = document.getElementById('ui-layer');
-        const crosshair = document.getElementById('crosshair');
+        const hud = document.getElementById('hud');
+        const interactionPrompt = document.getElementById('interaction-prompt');
+        const dialogueBox = document.getElementById('dialogue-box');
+        const coinCounterText = document.getElementById('coin-counter');
+        const distanceCounterText = document.getElementById('distance-counter');
+        const bgm = document.getElementById('bgm');
 
-        // Mouse Lock Logic (PointerLock)
-        instructions.addEventListener('click', () => {
+        // Mouse Lock Logic (Mulai Game)
+        startBtn.addEventListener('click', () => {
             document.body.requestPointerLock();
+            bgm.play().catch(e => console.log("Audio play di-block browser, interaksi user diperlukan."));
         });
 
         document.addEventListener('pointerlockchange', () => {
             if (document.pointerLockElement === document.body) {
                 isLocked = true;
                 uiLayer.style.display = 'none';
-                crosshair.style.display = 'block';
+                hud.style.display = 'block';
             } else {
                 isLocked = false;
                 uiLayer.style.display = 'flex';
-                crosshair.style.display = 'none';
+                hud.style.display = 'none';
             }
         });
 
@@ -300,18 +396,26 @@
             euler.y -= movementX * 0.002;
             euler.x -= movementY * 0.002;
             
-            // Batasi lihat atas/bawah
             euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, euler.x));
             camera.quaternion.setFromEuler(euler);
         });
 
-        // Keyboard Logic
+        // Keyboard Logic (A & D sudah diperbaiki, Shift & E ditambah)
         document.addEventListener('keydown', (e) => {
+            if (!isLocked) return;
             switch(e.code) {
                 case 'KeyW': move.forward = true; break;
                 case 'KeyS': move.backward = true; break;
-                case 'KeyA': move.left = true; break;
-                case 'KeyD': move.right = true; break;
+                case 'KeyA': move.left = true; break; // A Kiri
+                case 'KeyD': move.right = true; break; // D Kanan
+                case 'ShiftLeft': 
+                case 'ShiftRight': move.sprint = true; break; // Sprint
+                case 'KeyE': 
+                    if(nearestNPC) {
+                        dialogueBox.style.display = 'block';
+                        dialogueBox.innerText = nearestNPC.userData.dialogue;
+                    }
+                    break;
             }
         });
         document.addEventListener('keyup', (e) => {
@@ -320,6 +424,8 @@
                 case 'KeyS': move.backward = false; break;
                 case 'KeyA': move.left = false; break;
                 case 'KeyD': move.right = false; break;
+                case 'ShiftLeft': 
+                case 'ShiftRight': move.sprint = false; break;
             }
         });
 
@@ -330,52 +436,81 @@
             requestAnimationFrame(animate);
             const delta = clock.getDelta();
 
-            // Pergerakan Pemain
             if (isLocked) {
+                // Fisika Pergerakan
                 velocity.x -= velocity.x * 10.0 * delta;
                 velocity.z -= velocity.z * 10.0 * delta;
 
                 direction.z = Number(move.forward) - Number(move.backward);
-                direction.x = Number(move.right) - Number(move.left);
-                direction.normalize(); // Biar gerak diagonal ga lebih cepat
+                // Fix Logika A dan D (Left -> gerak negatif di sumbu X lokal kamera)
+                direction.x = Number(move.left) - Number(move.right);
+                direction.normalize(); 
 
-                const speed = 25.0;
+                // Fitur Sprint Tak Terbatas
+                const speed = move.sprint ? 60.0 : 25.0;
+
                 if (move.forward || move.backward) velocity.z -= direction.z * speed * delta;
                 if (move.left || move.right) velocity.x -= direction.x * speed * delta;
 
                 camera.translateX(velocity.x * delta);
                 camera.translateZ(velocity.z * delta);
+                camera.position.y = 2; // Tinggi konstan
 
-                // Kunci tinggi kamera biar ga terbang
-                camera.position.y = 2;
+                // Update HUD Jarak
+                const distFromOrigin = Math.round(Math.sqrt(camera.position.x**2 + camera.position.z**2));
+                distanceCounterText.innerText = 'Jarak: ' + distFromOrigin + 'm';
 
-                // Logika Teleportasi
-                teleporters.forEach(pad => {
-                    const dist = camera.position.distanceTo(pad.position);
-                    if(dist < 2) {
-                        camera.position.x = pad.userData.targetX;
-                        camera.position.z = pad.userData.targetZ;
+                // Animasi Portal
+                portal.rotation.z += 0.5 * delta;
+
+                // Animasi Mobil
+                cars.forEach(car => {
+                    car.position.z += car.userData.speed * delta;
+                    if (car.position.z > 300) car.position.z = -400; // Looping jalan
+                    if (car.position.z < -400) car.position.z = 300;
+                });
+
+                // Animasi NPC (Naik turun biar kelihatan)
+                npcs.forEach(npc => {
+                    npc.position.y = npc.userData.baseY + Math.sin(clock.getElapsedTime() * 4) * 0.2;
+                });
+
+                // Deteksi Koin (Ambil Koin)
+                for (let i = coins.length - 1; i >= 0; i--) {
+                    let coin = coins[i];
+                    coin.rotation.y += 2 * delta; // Koin berputar
+                    if (camera.position.distanceTo(coin.position) < 2) {
+                        scene.remove(coin);
+                        coins.splice(i, 1);
+                        coinCount++;
+                        coinCounterText.innerText = 'Koin: ' + coinCount;
+                    }
+                }
+
+                // Deteksi NPC terdekat
+                let minDist = Infinity;
+                let activeNPC = null;
+                npcs.forEach(npc => {
+                    let dist = camera.position.distanceTo(npc.position);
+                    if(dist < 4 && dist < minDist) {
+                        minDist = dist;
+                        activeNPC = npc;
                     }
                 });
+
+                if (activeNPC) {
+                    interactionPrompt.style.display = 'block';
+                    nearestNPC = activeNPC;
+                } else {
+                    interactionPrompt.style.display = 'none';
+                    dialogueBox.style.display = 'none'; // Tutup dialog jika menjauh
+                    nearestNPC = null;
+                }
             }
-
-            // Animasi Hewan (Berkeliling)
-            animals.forEach(animal => {
-                animal.position.x += animal.userData.dirX;
-                animal.position.z += animal.userData.dirZ;
-
-                // Pantul jika kejauhan
-                if(animal.position.x > 80 || animal.position.x < -80) animal.userData.dirX *= -1;
-                if(animal.position.z > 80 || animal.position.z < -80) animal.userData.dirZ *= -1;
-
-                // Rotasi hewannya sedikit biar ga kaku
-                animal.rotation.y += 0.05;
-            });
 
             renderer.render(scene, camera);
         }
 
-        // Handle Resize layat
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
